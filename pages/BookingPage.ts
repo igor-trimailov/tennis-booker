@@ -26,12 +26,14 @@ export class BookingPage {
   }
 
   getBookingLinkForDate(bookingDate: string, slotStartTime: string, slotEndTime: string): Locator {
+    // Why: `data-test-id` contains UUID + date + start time. Suffix match keeps us stable when UUIDs change.
     return this.getSlotContainer(slotStartTime, slotEndTime)
       .locator(`a[data-test-id$="|${bookingDate}|${slotStartTime}"]:has-text("Book at")`)
       .first();
   }
 
   getTakenSessionForDate(bookingDate: string, slotStartTime: string, slotEndTime: string): Locator {
+    // Why: "Booked" is the explicit terminal state where another user has already claimed this slot.
     return this.getSlotContainer(slotStartTime, slotEndTime)
       .locator(`a[data-test-id$="|${bookingDate}|${slotStartTime}"]:has-text("Booked")`)
       .first();
@@ -56,17 +58,18 @@ export class BookingPage {
     while (Date.now() < loopDeadline) {
       await slot.waitFor({ state: 'visible', timeout: 30_000 });
 
-      if ((await takenSession.count()) > 0) {
-        throw new Error(`Slot ${slotStartTime}-${slotEndTime} is already booked by someone else.`);
-      }
-
       if ((await bookingLink.count()) > 0) {
         await expect(bookingLink).toBeVisible();
         console.log(`Slot is now available on attempt ${attempt}.`);
         return bookingLink;
       }
 
+      if ((await takenSession.count()) > 0) {
+        throw new Error(`Slot ${slotStartTime}-${slotEndTime} is already booked by someone else.`);
+      }
+
       console.log(`Attempt ${attempt}: slot unavailable, reloading in 30 seconds...`);
+      // Why: fixed polling cadence avoids hammering the site but still reacts quickly when slots open.
       await this.page.waitForTimeout(pollIntervalMs);
       await this.page.reload({ waitUntil: 'domcontentloaded', timeout: reloadTimeoutMs });
       attempt += 1;
@@ -78,6 +81,7 @@ export class BookingPage {
   async bookWhenAvailable(
     options: WaitForSlotAvailabilityOptions & { stepTimeoutMs?: number }
   ): Promise<void> {
+    // Why: follow-up modals can appear slowly; explicit step timeout gives a clear failure reason.
     const { stepTimeoutMs = 3 * 60 * 1000 } = options;
     const bookingLink = await this.waitForSlotAvailability(options);
 
