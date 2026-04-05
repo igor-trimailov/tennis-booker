@@ -14,7 +14,7 @@ export class BookingPage {
 
   async gotoBookingDate(baseBookingUrl: string, bookingDate: string): Promise<void> {
     const bookingUrl = `${baseBookingUrl}#?date=${bookingDate}`;
-    console.log(`Navigating to booking URL: ${bookingUrl}`);
+    console.log(`Navigating to booking page for date ${bookingDate}.`);
     await this.page.goto(bookingUrl);
     await expect(this.page).toHaveTitle(/Eastville Park/);
   }
