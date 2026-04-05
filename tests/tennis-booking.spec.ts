@@ -1,18 +1,23 @@
 import { test, expect } from '@playwright/test';
+const { addDays, format } = require('date-fns');
 
 test('login to tennis booking website', async ({ page }) => {
   // Load environment variables
-  const bookingUrl = process.env.TENNIS_BOOKING_URL;
+  const baseBookingUrl = process.env.TENNIS_BOOKING_URL;
   const username = process.env.TENNIS_USERNAME;
   const password = process.env.TENNIS_PASSWORD;
 
-  if (!bookingUrl) {
+  if (!baseBookingUrl) {
     throw new Error('TENNIS_BOOKING_URL is not set in .env file');
   }
 
   if (!username || !password) {
     throw new Error('TENNIS_USERNAME and TENNIS_PASSWORD must be set in .env file');
   }
+
+  // Calculate booking date: today + 7 days
+  const bookingDate = format(addDays(new Date(), 7), 'yyyy-MM-dd');
+  const bookingUrl = baseBookingUrl + bookingDate;
 
   // Navigate to the tennis booking website
   await page.goto(bookingUrl);
