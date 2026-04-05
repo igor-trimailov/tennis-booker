@@ -9,8 +9,6 @@ Automated tennis court booking using Playwright.
    npm install
    ```
 
-   The project uses `date-fns` for date manipulation.
-
 2. Install Playwright browsers:
    ```bash
    npm run test:e2e:install
@@ -24,8 +22,6 @@ Automated tennis court booking using Playwright.
    HEADLESS=false
    ```
 
-   **Note**: If your password contains special characters like `#`, wrap it in quotes to prevent it from being treated as a comment.
-
 ## Running Tests
 
 - Run all tests: `npm run test:e2e`
@@ -33,15 +29,3 @@ Automated tennis court booking using Playwright.
 - Debug mode: `npm run test:e2e:debug`
 - UI mode: `npm run test:e2e:ui`
 - Generate code: `npm run test:e2e:codegen`
-
-## Date Utilities
-
-The project uses [date-fns](https://date-fns.org/) for date manipulation. Example usage:
-
-```javascript
-const { addWeeks, format } = require('date-fns');
-
-const today = new Date();
-const nextWeek = addWeeks(today, 1);
-const formatted = format(nextWeek, 'yyyy-MM-dd'); // "2026-04-12"
-```
