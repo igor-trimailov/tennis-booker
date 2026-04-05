@@ -1,8 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
+import { BookingPage } from '../pages/BookingPage';
+import { LoginPage } from '../pages/LoginPage';
 const { addDays, format } = require('date-fns');
 
 test('login to tennis booking website', async ({ page }) => {
-  // Load environment variables
   const baseBookingUrl = process.env.TENNIS_BOOKING_URL;
   const username = process.env.TENNIS_USERNAME;
   const password = process.env.TENNIS_PASSWORD;
@@ -15,38 +16,19 @@ test('login to tennis booking website', async ({ page }) => {
     throw new Error('TENNIS_USERNAME and TENNIS_PASSWORD must be set in .env file');
   }
 
-  // Calculate booking date: today + 7 days
   const bookingDate = format(addDays(new Date(), 7), 'yyyy-MM-dd');
-  const bookingUrl = baseBookingUrl + bookingDate;
+  const bookingPage = new BookingPage(page);
+  const loginPage = new LoginPage(page);
 
-  // Navigate to the tennis booking website
-  await page.goto(bookingUrl);
+  await bookingPage.gotoBookingDate(baseBookingUrl, bookingDate);
+  await loginPage.login(username, password);
 
-  // Basic check - ensure the page loaded
-  await expect(page).toHaveTitle(/Eastville Park/);
+  await bookingPage.bookWhenAvailable({
+    bookingDate,
+    slotStartTime: '1080',
+    slotEndTime: '1140',
+    stepTimeoutMs: 3 * 60 * 1000,
+  });
 
-  // Click sign in link
-  await page.getByTestId('sign-in-link').click();
-
-  // In new page, click login button
-  
-  await page.getByRole('button', { name: 'Login' }).click();
-
-  // Fill in credentials
-  await page.getByRole('textbox', { name: 'Username' }).fill(username);
-  await page.getByPlaceholder('Password').fill(password);
-
-  // Submit login
-  await page.getByRole('button', { name: 'Log in' }).click();
-
-  // Wait for login to complete - adjust selector based on what appears after login
-  await page.waitForLoadState('networkidle');
-
-
-
-  // Verify login success - adjust this based on what indicates successful login
-  // For example, check for a logout button or user profile element
-  // await expect(page.getByText('Welcome')).toBeVisible();
-
-  console.log('Login completed successfully');
+  console.log('Booking flow completed.');
 });
