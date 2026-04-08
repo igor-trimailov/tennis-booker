@@ -25,8 +25,8 @@ test('login to tennis booking website', async ({ page }) => {
 
   await bookingPage.bookWhenAvailable({
     bookingDate,
-    slotStartTime: '1080',
-    slotEndTime: '1140',
+    timeSlotStartTime: '1080',
+    timeSlotEndTime: '1140',
     stepTimeoutMs: 3 * 60 * 1000,
   });
 
