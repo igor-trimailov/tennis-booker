@@ -1,8 +1,7 @@
 name: Playwright Tests
 on:
   schedule:
-    - cron: '58 7 * * 2,4'
-      timezone: 'Europe/London'
+    - cron: '58 6 * * 4'
 jobs:
   test:
     timeout-minutes: 60
